@@ -44,44 +44,26 @@ using namespace std;
 
 int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& lnk, double alpha, double beta, int stp, double*& I_star, double inf_rate, int nbr_infs, double *& N_star, double *& k_star, int maxMCS, int nouMCS, double inf_death_rate) {
 
-  int i, j, k, ii, n, jj, l, MCS, numberPayoffs;
-  int node1, node2;
-  int end1, end2;
+  int i, j, k, ii, n, jj, l, MCS, numberPayoffs, newborn, ndead, linkchange, Popn, suscepts;
+  int node1, node2, end1, end2;
   int factor=1;
   double kmax=k0;
 	double t = 0.00;
-	double u, dt;
+	double u, dt, avdeg;
 	double avdeg;
 	int vertex = -1;
 	double H, L;
-	double C, B, R, rate1, RT, R3, R4, R5, R6;
-	double totalpayoff, brktotalpayoff;
-	int nbrNodes = 1000;
-	int maxEdges = E;
-	int mxdeg = 1000;
-	int maxDeg = 1000;
-	int Init_Infected = 500;
-	int hi_benefits = 0;
-	int lo_benefits = 0;
-	int hi_suscepts = 0;
-	int lo_suscepts = 0;
-	int hi_infected = 0;
-	int lo_infected = 0;
-	int mxej = maxEdges;
-    int mcsStart=500000;
-
-	int newborn, ndead, linkchange, Popn, suscepts;
-	double birth_rate, death_rate, infection_rate, infection_death;
+	double C, B, R, rate1, RT, R3, R4, R5, R6, totalpayoff, brktotalpayoff;
+	int nbrNodes = 1000, maxEdges=E, mxdeg=1000, maxDeg=1000, Init_Infected=500;
+	int hi_benefits = 0, lo_benefits=0, hi_suscepts=0, lo_suscepts=0, hi_infected=0, lo_infected=0;
+	int mxej = maxEdges, mcsStart=500000;
+    double birth_rate, death_rate, infection_rate, infection_death;
 	Popn = N;
 	suscepts = Popn;
 	int process=-1;
 
-    	MCS = 0;
-	int breaking = 0;
-	
-	int create = 0;
-	int brak = 0;
-	int mcs = 0;
+    MCS = 0;
+	int breaking = 0, create=0, brak=0, mcs=0;
 	/*
 	The following integer arrays are to store the time series of infection prevalence according to benefit values. i.e., the fraction infected
 	that are high or low benefits. The arrays are initialized to zero integers.
@@ -121,7 +103,6 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 	numberPayoffs = numberbenefits * mxdeg;
 
 
-
 	double* payoffdistr = new double[numberPayoffs];
 	for (n = 0; n < numberPayoffs; n++)
 		payoffdistr[n] = 0.0;
@@ -144,7 +125,6 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 		Inodes[n] = -10;
 		
 	}
-
 
 	int lngth = 2*Popn;
 	int *Sn;   // dimensions 1 x mxdeg 
@@ -275,11 +255,8 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 			nd[sick]->set_Inodes_indx(nInfected);  // Update it's infection status
 			nInfected++;                          
 		    suscepts--;
-
 		    ii++;
-
 	       }
-
 	  }
 
 
@@ -293,17 +270,13 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 	int cntr = 0;
 
 	float *rxn = new float[nouMCS];
-
-
 	for (n = 0; n < nouMCS; n++) {
 		rxn[n] = 0.0;
 	}
- 
-	
+ 	
 	newborn = 0;
 	ndead = 0;
 	linkchange = 0;
-
 	
 	sInbrs = 0;
 	for (n = 0; n < 100; n++) {      // Sums up the number of infected neighbor over the network. Nodes have been grouped according to the number
@@ -311,11 +284,9 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 	}                                // be less than 20, it is safe to have a maximum of 100 without running into array out of bounds, segmentation faults.
 
        
-        c_0 = 1 / double(k0);        // Parameter k0 is risk tolerance
+    c_0 = 1 / double(k0);        // Parameter k0 is risk tolerance
 		
-
 	for (MCS = 0; MCS < maxMCS; MCS++) {
-
 	             		
 		totalpayoff = 0.0;           //initializes the link creation rate to zero...totalpayoff here corresponds to sum(payoffs) over all nodes
 		brktotalpayoff = 0.0;        //initializes link breaking rate to zero... corresponds to sum((1-payoff)*degree) over all nodes 
@@ -743,13 +714,7 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 
 	 avdeg=0.00;
 	 
-	 double I_ss=0.0;
-	 double I_ss1=0.00;
-     double k_ss=0.0;
-	 double var_ss=0.0;
-	 double N_ss=0.0;
-	 double N_ss1=0.0;
-	 double k_star_ss=0.0;
+	 double I_ss=0.0, I_ss1=0.00, k_ss=0.0, var_s=0.0, N_ss=0.0, N_ss1=0.00, k_star_ss=0;
 	 
 	
 	 for(mcs=mcsStart;mcs<nouMCS;mcs++)
