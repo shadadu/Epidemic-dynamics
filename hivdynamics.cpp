@@ -42,7 +42,8 @@ using namespace std;
 
 
 
-int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& lnk, double alpha, double beta, int stp, double*& I_star, double inf_rate, int nbr_infs, double *& N_star, double *& k_star, int maxMCS, int nouMCS, double inf_death_rate) {
+int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& lnk, double alpha, double beta, int stp, 
+	double*& I_star, double inf_rate, int nbr_infs, double *& N_star, double *& k_star, int maxMCS, int nouMCS, double inf_death_rate) {
 
   int i, j, k, ii, n, jj, l, MCS, numberPayoffs, newborn, ndead, linkchange, Popn, suscepts;
   int node1, node2, end1, end2;
@@ -578,7 +579,8 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 			 int lastnode_Inodes_indx=nd[lastnode]->get_Inodes_indx();
 			 /* 
 			 Remove dead node from system; book-keeping */
-			 numberLinks = death(dud, lastnode, nd, lnk, N, E, numberLinks,c_0,d, ben_arr, G, Q, numberPayoffs,Sm,Sn,Inodes,sInbrs,nInfected );
+			 numberLinks = death(dud, lastnode, nd, lnk, N, E, numberLinks,c_0,d, \
+			 	 ben_arr, G, Q, numberPayoffs,Sm,Sn,Inodes,sInbrs,nInfected );
 			 
 			 Popn--;
 		  
@@ -857,7 +859,7 @@ int hivdynamics(double k0, int N, int E, int numberLinks, node **& nd,Link **& l
 	 benefits_infected.open("benefitsandinfection");
 	 for(n=0;n<nouMCS;n++)
 	   {
-	benefits_infected<<tyme[n]<<"  "<<ts_lo_infected[n]<< "  "<<ts_lo_susceptibles[n] <<"   "<<ts_hi_infected[n]<<"   "<<ts_hi_susceptibles[n]<<"   "<<infected_number_series[n]<<"   "<<Pop_time[n]<<endl;
+	benefits_infected<<tyme[n]<<"  "<<ts_lo_infected[n]<< "  "<<ts_lo_susceptibles[n] <<"  "<<ts_hi_infected[n]<<"   "<<ts_hi_susceptibles[n]<<"   "<<infected_number_series[n]<<"   "<<Pop_time[n]<<endl;
 	   }
 	 benefits_infected.close();	 
 
