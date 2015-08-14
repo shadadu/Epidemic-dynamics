@@ -1,0 +1,160 @@
+function u = HMFinfdydt(t,y);
+
+% gamma=death rate
+% mu=birth/migration rate
+
+% infection rate
+% gamma=rate of death from infection
+
+global lambda alpha  beta  sigma  gamma  nu  infstate M  P U tmr  init_avgdeg
+
+x=zeros(infstate,M+1);
+
+C=zeros(1,M+1);           %declare array for holding link creation probability of each degree/benefit class
+B=zeros(1,M+1);           %declare array for holding link breaking probability of each degree/benefit class
+
+
+H=zeros(infstate,M+1);
+THETA=zeros(1,M+1);
+RHO=zeros(1,M+1);
+array_PHI=zeros(1,M+1);
+
+for j=1:infstate
+   for i=1:M+1
+    H(j,i)=i-1;
+   end
+end
+
+for i=1:M+1
+    x(1,i)=y(i);
+end
+
+for i=M+2:2*(M+1)
+    x(2,i-(M+1))=y(i);
+end
+
+
+RHO = x(2,:)./sum(x,1);
+
+
+N1=sum(x,2);
+
+sicks=N1(2);
+
+
+N=sum(y);
+C = (x.*P);
+
+sumC=(alpha/N)*sum(sum(C));
+
+avg_deg=(sum(sum(H.*x)))./N;
+
+
+
+
+B = (beta*(H.*x.*(1-P)))/(N*avg_deg);
+
+U(1,tmr)=sicks;
+U(2,tmr)=avg_deg;
+
+
+tmr=tmr+1;
+
+
+sumB=sum(sum(B));
+
+
+
+XI=sum(x,1);
+
+
+
+for k=1:M+1
+   XI(k)=(k-1)*XI(k);
+end
+
+THETA=(XI)./(N*avg_deg);
+
+sizeTHETA=size(THETA);
+
+array_PHI=THETA.*RHO;
+
+PHI=sum(array_PHI);
+
+
+%dn_0/dt
+    
+  xdot2(1,1) = (x(1,2))*sumB  +  beta*x(1,2)*(1-P(1,2)) - x(1,1)*P(1,1)*sumC  - x(1,1)*gamma  +  sigma;  
+  
+  xdot2(2,1) = (x(2,2))*sumB  +  beta*x(2,2)*(1-P(2,2)) - x(2,1)*P(2,1)*sumC  - x(2,1)*gamma  -  x(2,1)*nu;
+  
+    
+%%loop for equations ndot(k), k=2,...,M  in Matlab i.e. k=1,..,M-1 actually
+
+
+for j=1
+    for k=2:M  
+        xdot2(j,k) = -(x(j,k)*(k-1))*sumB - beta*x(j,k)*(k-1)*(1-P(j,k)) + ...
+                  (x(j,k+1)*((k-1)+1) )*sumB + beta*(x(j,k+1))*((k-1)+1)*(1-P(j,k+1)) ... 
+                   - x(j,k)*P(j,k)*sumC + x(j,k-1)*P(j,k-1)*sumC...
+                   - x(j,k)*gamma - x(j,k)*(k-1)*lambda*PHI;
+    end
+end
+
+
+for j=2
+    for k=2:M  
+     xdot2(j,k) = -(x(j,k)*(k-1))*sumB - beta*x(j,k)*(k-1)*(1-P(j,k)) + ...
+                  (x(j,k+1)*((k-1)+1) )*sumB + beta*(x(j,k+1))*((k-1)+1)*(1-P(j,k+1)) ... 
+                   - x(j,k)*P(j,k)*sumC + x(j,k-1)*P(j,k-1)*sumC...
+                   - x(j,k)*gamma +  x(j-1,k)*(k-1)*lambda*PHI - x(j,k)*nu;
+     end
+end
+
+
+%dn_M/dt
+
+for j=1
+    xdot2(j,M+1) = -( x(j,M+1)*((M-1)+1) )*sumB - beta*x(j,M+1)*((M-1)+1)*(1-P(j,M+1)) + x(j,M)*P(M)*sumC...
+                   -x(j,M+1)*gamma - x(j,M+1)*(M+1-1)*lambda*PHI;
+end
+
+
+for j=2
+    xdot2(j,M+1) = -( x(j,M+1)*((M-1)+1) )*sumB - beta*x(j,M+1)*((M-1)+1)*(1-P(j,M+1)) + x(j,M)*P(j,M)*sumC...
+                   -x(j,M+1)*gamma + x(j-1,M+1)*(M+1-1)*lambda*PHI -  x(j,M+1)*nu;
+end
+
+
+
+
+for i=1:M+1
+   ydot2(i)=xdot2(1,i); 
+end
+
+for i=M+2:2*(M+1)
+    ydot2(i)=xdot2(2,i-(M+1) );
+end
+
+% ydot2;
+% sumydot=sum(ydot2);
+% sumy=sum(y);
+
+avg_deg=(sum(sum(H.*x)))/N;
+
+u=ydot2';
+%clear x C B H THETA RHO array_PHI N1 N C sumC avg_deg XI THETA sizeTHETA array_PHI PHI xdot2 ydot2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
